@@ -41,11 +41,19 @@ library(dplyr)
 ```
 # read CSV data 
 ```{r}
-(tutorial_points <- read_csv("tutorial_points.csv"))
+(tutorial_points <- read_csv("data/tutorial_points.csv"))
 ```
-# load tibble 
+# create a Map with Leaflet 
 ```{r}
-library(tibble)
+m <- leaflet(tutorial_points)
+m <- addTiles(m)
+m <- m %>%
+  addMarkers(
+    lng = ~decimalLongitude,  
+    lat = ~decimalLatitude,
+    popup = ~paste("gbifID ", gbifID)
+  )
+  m                            
 ```
 ```{r}
 as_tibble(tutorial)
