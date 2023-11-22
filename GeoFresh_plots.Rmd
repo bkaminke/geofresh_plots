@@ -1,0 +1,123 @@
+---
+title: "GeoFresh"
+subtitle: ""
+author: ""
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+# install Tidyverse-Package 
+# load all libaries
+```{r}
+library(readr)
+library(tibble)
+library(ggplot2)
+library(leaflet)
+library(dplyr)
+
+```
+# read CSV data 
+```{r}
+(tutorial_points <- read_csv("data/tutorial_points.csv"))
+```
+# create a Map with Leaflet 
+```{r}
+m <- leaflet(tutorial_points)
+m <- addTiles(m)
+m <- m %>%
+  addMarkers(
+    lng = ~decimalLongitude,  
+    lat = ~decimalLatitude,
+    popup = ~paste("gbifID ", gbifID)
+  )
+  m                            
+```
+
+# load Geo-Fresh CSV-Data
+
+```{r}
+(climate_local <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-climate-local.csv"))
+```
+
+```{r}
+(climate_upstream <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-climate-upstream.csv"))
+```
+
+```{r}
+(landcover_local <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-land-cover-local.csv"))
+```
+
+```{r}
+(landcover_upstream <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-land-cover-upstream.csv"))
+```
+
+```{r}
+(soil_local <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-soil-local.csv"))
+```
+
+```{r}
+(soil_upstream <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-soil-upstream.csv"))
+```
+
+```{r}
+(topography_local <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-topography-local.csv"))
+```
+
+```{r}
+(topography_upstream <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-topography-upstream.csv"))
+```
+
+# Filter by mean  
+```{r}
+climate_local_filtered <- climate_local %>%
+  select(bio1_mean,bio2_mean,bio3_mean,bio4_mean,bio5_mean,bio6_mean,bio7_mean,bio8_mean,bio9_mean,bio10_mean,bio11_mean,bio12_mean,bio13_mean,bio14_mean,bio15_mean,bio16_mean,bio17_mean,bio18_mean,bio19_mean)
+
+print(climate_local_filtered)
+```
+
+```{r}
+climate_upstream_filtered <- climate_upstream %>%
+  select(bio1_mean,bio2_mean,bio3_mean,bio4_mean,bio5_mean,bio6_mean,bio7_mean,bio8_mean,bio9_mean,bio10_mean,bio11_mean,bio12_mean,bio13_mean,bio14_mean,bio15_mean,bio16_mean,bio17_mean,bio18_mean,bio19_mean)
+
+print(climate_upstream_filtered)
+```
+
+# Create histograms 
+```{r}
+# climate_local
+# Create histograms for each column and display them in a row
+par(mfrow = c(1, 2))  
+
+for (col_name in names(climate_local_filtered)) {
+  hist(climate_local_filtered[[col_name]],
+       main = paste("Histogram for", col_name),
+       xlab = col_name,
+       col = "skyblue",
+       border = "black")
+}
+```
+
+```{r}
+# climate_upstream
+# Create histograms for each column and display them in a row
+par(mfrow = c(1, 2))  
+
+for (col_name in names(climate_upstream_filtered)) {
+  hist(climate_local_filtered[[col_name]],
+       main = paste("Histogram for", col_name),
+       xlab = col_name,
+       col = "skyblue",
+       border = "black")
+}
+```
+
