@@ -30,10 +30,14 @@ plot(pressure)
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 # install Tidyverse-Package 
-# load readr
-
+# load all libraries
 ```{r}
 library(readr)
+library(tibble)
+library(ggplot2)
+library(leaflet)
+library(dplyr)
+
 ```
 # read CSV data 
 ```{r}
