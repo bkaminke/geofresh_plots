@@ -55,11 +55,42 @@ m <- m %>%
   )
   m                            
 ```
+
+# load Geo-Fresh CSV-Data
+
 ```{r}
-as_tibble(tutorial)
+(climate_local <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-climate-local.csv"))
 ```
 
 ```{r}
-library(ggplot2)
+(climate_upstream <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-climate-upstream.csv"))
 ```
 
+```{r}
+(landcover_local <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-land-cover-local.csv"))
+```
+
+```{r}
+(landcover_upstream <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-land-cover-upstream.csv"))
+```
+
+```{r}
+(soil_local <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-soil-local.csv"))
+```
+
+```{r}
+(soil_upstream <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-soil-upstream.csv"))
+```
+
+```{r}
+(topography_local <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-topography-local.csv"))
+```
+
+```{r}
+(topography_upstream <- read_csv("U:/R-Studio/data/geofresh-2023-11-13-env-var-topography-upstream.csv"))
+```
+
+# Summary 
+```{r}
+summary(climate_local)
+```
