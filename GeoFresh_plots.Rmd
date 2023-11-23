@@ -77,7 +77,7 @@ m <- m %>%
 (topography_upstream <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-topography-upstream.csv"))
 ```
 
-# Filter by mean  
+# filter by mean  
 ```{r}
 climate_local_filtered <- climate_local %>%
   select(bio1_mean,bio2_mean,bio3_mean,bio4_mean,bio5_mean,bio6_mean,bio7_mean,bio8_mean,bio9_mean,bio10_mean,bio11_mean,bio12_mean,bio13_mean,bio14_mean,bio15_mean,bio16_mean,bio17_mean,bio18_mean,bio19_mean)
@@ -92,7 +92,7 @@ climate_upstream_filtered <- climate_upstream %>%
 print(climate_upstream_filtered)
 ```
 
-# Create histograms for climate_local and climate_upstream
+# create histograms for climate_local and climate_upstream
 ```{r}
 # climate_local
 # Create histograms for each column and display them in a row
@@ -120,7 +120,7 @@ for (col_name in names(climate_upstream_filtered)) {
 }
 ```
 
-# Filter by mean and continuous 
+# filter by mean and continuous 
 ```{r}
 topography_local_filtered <- topography_local %>%
   select(elev_mean,flowpos_mean,spi_mean,sti_mean,cti_mean)
@@ -161,13 +161,21 @@ for (col_name in names(topography_upstream_filtered)) {
 }
 ```
 
-# Create Boxplots for landcover_local
+# create Boxplots for landcover_local
 ```{r}
 ggplot(stack(landcover_local[ ,3:24]), aes(x = factor(ind, levels = names(landcover_local)), y = values)) + 
   geom_boxplot()
 ```
 
+# load environmental_variables CSV-Data 
 ```{r}
 (environmental_variables <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh_environmental_variables - env_var_for_plots.csv"))
+```
+```{r}
+selected_values <- environmental_variables$Variable[81:102]
+ggplot(stack(landcover_local[ ,3:24]), aes(x = factor(ind, levels = names(landcover_local)), y = values)) +
+  geom_boxplot() +
+  scale_x_discrete(name = "landcover local", labels = selected_values, guide = guide_axis(angle = 60))
+
 ```
 
