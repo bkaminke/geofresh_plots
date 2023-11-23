@@ -92,7 +92,7 @@ climate_upstream_filtered <- climate_upstream %>%
 print(climate_upstream_filtered)
 ```
 
-# Create histograms 
+# Create histograms for climate_local and climate_upstream
 ```{r}
 # climate_local
 # Create histograms for each column and display them in a row
@@ -127,8 +127,6 @@ topography_local_filtered <- topography_local %>%
 
 print(topography_local_filtered)
 ```
-
-# Filter by mean and continuous 
 ```{r}
 topography_upstream_filtered <- topography_upstream %>%
   select(elev_mean,flowpos_mean,spi_mean,sti_mean,cti_mean)
@@ -136,6 +134,7 @@ topography_upstream_filtered <- topography_upstream %>%
 print(topography_upstream_filtered)
 ```
 
+# Create histograms for topography_local and topography_upstream
 ```{r}
 # topography_local
 par(mfrow = c(1, 2))  
@@ -161,3 +160,14 @@ for (col_name in names(topography_upstream_filtered)) {
        border = "black")
 }
 ```
+
+# Create Boxplots for landcover_local
+```{r}
+ggplot(stack(landcover_local[ ,3:24]), aes(x = factor(ind, levels = names(landcover_local)), y = values)) + 
+  geom_boxplot()
+```
+
+```{r}
+(environmental_variables <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh_environmental_variables - env_var_for_plots.csv"))
+```
+
