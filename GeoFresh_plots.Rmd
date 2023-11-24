@@ -161,7 +161,7 @@ for (col_name in names(topography_upstream_filtered)) {
 }
 ```
 
-# create Boxplots for landcover_local
+# create boxplots for landcover_local
 ```{r}
 ggplot(stack(landcover_local[ ,3:24]), aes(x = factor(ind, levels = names(landcover_local)), y = values)) + 
   geom_boxplot()
@@ -194,6 +194,24 @@ ggplot(stack(landcover_local_copy[ ,3:24]), aes(x = factor(ind, levels = names(l
   scale_x_discrete(name = "Landcover local", labels = selected_values, guide = guide_axis(angle = 60)) + ylim(0.00, 100)
 ```
 
+# copy landcover_upstream and multiply all columns with 100
+```{r}
+landcover_upstream_copy <- landcover_upstream
 
+landcover_upstream_copy <- landcover_upstream_copy %>%
+  mutate_at(vars(c10:c220), ~ . * 100)
+
+
+print(landcover_upstream_copy)
+```
+
+
+# create boxplots for landcover_upstream_copy
+```{r}
+selected_values <- environmental_variables$Variable[81:102]
+ggplot(stack(landcover_upstream_copy[ ,3:24]), aes(x = factor(ind, levels = names(landcover_upstream_copy)), y = values)) +
+  geom_boxplot() +
+  scale_x_discrete(name = "Landcover upstream", labels = selected_values, guide = guide_axis(angle = 60)) + ylim(0.00, 100)
+```
 
 
