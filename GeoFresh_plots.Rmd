@@ -201,17 +201,57 @@ landcover_upstream_copy <- landcover_upstream
 landcover_upstream_copy <- landcover_upstream_copy %>%
   mutate_at(vars(c10:c220), ~ . * 100)
 
-
 print(landcover_upstream_copy)
 ```
-
 
 # create boxplots for landcover_upstream_copy
 ```{r}
 selected_values <- environmental_variables$Variable[81:102]
+
 ggplot(stack(landcover_upstream_copy[ ,3:24]), aes(x = factor(ind, levels = names(landcover_upstream_copy)), y = values)) +
   geom_boxplot() +
   scale_x_discrete(name = "Landcover upstream", labels = selected_values, guide = guide_axis(angle = 60)) + ylim(0.00, 100)
 ```
 
 
+# create histograms for soil_local and soil_upstream
+```{r}
+# soil_local
+par(mfrow = c(1, 2))  
+
+for (col_name in names(soil_local)) {
+  hist(soil_local[[col_name]],
+       main = paste("Histogram for", col_name),
+       xlab = col_name,
+       col = "skyblue",
+       border = "black")
+}
+```
+
+```{r}
+# soil_upstream
+par(mfrow = c(1, 2))  
+
+for (col_name in names(soil_upstream)) {
+  hist(soil_upstream[[col_name]],
+       main = paste("Histogram for", col_name),
+       xlab = col_name,
+       col = "skyblue",
+       border = "black")
+}
+```
+
+# create boxplots for the columns clyppt (Clay content), sndppt (Sand content), sltppt (Silt content) from soil_local 
+```{r}
+soil_local_filtered <- soil_local %>%
+  select(clyppt_mean,sndppt_mean,sltppt_mean)
+
+selected_values <- environmental_variables$Variable[67:69]
+
+ggplot(stack(soil_local_filtered), aes(x = factor(ind, levels = names(soil_local_filtered)), y = values)) + 
+  geom_boxplot()+
+  scale_x_discrete(name = "Soil local (Clay content, Sand content, Silt content)", labels = selected_values, guide = guide_axis(angle = 60)) + ylim(0.00, 100)
+
+```
+ 
+ 
