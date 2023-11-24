@@ -253,5 +253,20 @@ ggplot(stack(soil_local_filtered), aes(x = factor(ind, levels = names(soil_local
   scale_x_discrete(name = "Soil local (Clay content, Sand content, Silt content)", labels = selected_values, guide = guide_axis(angle = 60)) + ylim(0.00, 100)
 
 ```
+
+# searched climate_local for unique and not unique values 
+```{r}
+unique_subc_id <- unique(climate_local$subc_id)
+
+print(unique_subc_id)
+```
+ 
+```{r}
+not_unique_subc_id <- table(as.character(climate_local$subc_id))
+
+duplicated_values <- as.numeric(names(not_unique_subc_id [not_unique_subc_id > 1]))
+
+print(duplicated_values)
+```
  
  
