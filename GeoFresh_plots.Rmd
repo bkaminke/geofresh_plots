@@ -260,13 +260,28 @@ unique_subc_id <- unique(climate_local$subc_id)
 
 print(unique_subc_id)
 ```
- 
+# no unique values in climate_local 
 ```{r}
 not_unique_subc_id <- table(as.character(climate_local$subc_id))
 
 duplicated_values <- as.numeric(names(not_unique_subc_id [not_unique_subc_id > 1]))
 
 print(duplicated_values)
+```
+
+# Diagram for the frequency of strahler numbers in topography_local
+```{r}
+frequencies <- table(topography_local$strahler)
+
+max_frequencies <- max(frequencies)
+
+barplot(table(topography_local$strahler),
+        main = "Frequency of the flow order numbers",
+        xlab = "Strahler (flow order numbers)",
+        ylab = "Frequency",
+        col = "skyblue",
+        border = "black",
+        ylim = c(0, max_frequencies + 5))
 ```
  
  
