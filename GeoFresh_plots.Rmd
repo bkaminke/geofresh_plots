@@ -24,7 +24,7 @@ library(tibble)
 library(ggplot2)
 library(leaflet)
 library(dplyr)
-
+library(tidyr)
 ```
 # read CSV data 
 ```{r}
@@ -75,6 +75,12 @@ m <- m %>%
 
 ```{r}
 (topography_upstream <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-topography-upstream.csv"))
+```
+
+
+# load environmental_variables CSV-Data 
+```{r}
+(environmental_variables <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh_environmental_variables - env_var_for_plots.csv"))
 ```
 
 # filter by mean  
@@ -134,9 +140,9 @@ topography_upstream_filtered <- topography_upstream %>%
 print(topography_upstream_filtered)
 ```
 
-# Create histograms for topography_local and topography_upstream
+# Create histograms for topography_local_filtered and topography_upstream_filtered
 ```{r}
-# topography_local
+# topography_local_filtered
 par(mfrow = c(1, 2))  
 
 for (col_name in names(topography_local_filtered)) {
@@ -167,10 +173,6 @@ ggplot(stack(landcover_local[ ,3:24]), aes(x = factor(ind, levels = names(landco
   geom_boxplot()
 ```
 
-# load environmental_variables CSV-Data 
-```{r}
-(environmental_variables <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh_environmental_variables - env_var_for_plots.csv"))
-```
 
 # copy landcover local and multiply all columns with 100
 ```{r}
@@ -213,27 +215,36 @@ ggplot(stack(landcover_upstream_copy[ ,3:24]), aes(x = factor(ind, levels = name
   scale_x_discrete(name = "Landcover upstream", labels = selected_values, guide = guide_axis(angle = 60)) + ylim(0.00, 100)
 ```
 
+```{r}
+soil_local_filtered <- soil_local %>%
+  select(awcts_mean,wwp_mean,orcdrc_mean,phihox_mean,bldfie_mean,cecsol_mean,crfvol_mean,acdwrb_mean,bdricm_mean,bdrlog_mean,histpr_mean,slgwrb_mean)
+
+soil_upstream_filtered <- soil_upstream %>%
+  select(awcts_mean,wwp_mean,orcdrc_mean,phihox_mean,bldfie_mean,cecsol_mean,crfvol_mean,acdwrb_mean,bdricm_mean,bdrlog_mean,histpr_mean,slgwrb_mean)
+```
+
 
 # create histograms for soil_local and soil_upstream
 ```{r}
-# soil_local
+# soil_local_filtered
 par(mfrow = c(1, 2))  
 
-for (col_name in names(soil_local)) {
-  hist(soil_local[[col_name]],
+for (col_name in names(soil_local_filtered)) {
+  hist(soil_local_filtered[[col_name]],
        main = paste("Histogram for", col_name),
        xlab = col_name,
        col = "skyblue",
        border = "black")
 }
+
 ```
 
 ```{r}
-# soil_upstream
+# soil_upstream_filtered
 par(mfrow = c(1, 2))  
 
-for (col_name in names(soil_upstream)) {
-  hist(soil_upstream[[col_name]],
+for (col_name in names(soil_upstream_filtered)) {
+  hist(soil_upstream_filtered[[col_name]],
        main = paste("Histogram for", col_name),
        xlab = col_name,
        col = "skyblue",
@@ -243,12 +254,12 @@ for (col_name in names(soil_upstream)) {
 
 # create boxplots for the columns clyppt (Clay content), sndppt (Sand content), sltppt (Silt content) from soil_local 
 ```{r}
-soil_local_filtered <- soil_local %>%
+soil_local_filtered_2 <- soil_local %>%
   select(clyppt_mean,sndppt_mean,sltppt_mean)
 
 selected_values <- environmental_variables$Variable[67:69]
 
-ggplot(stack(soil_local_filtered), aes(x = factor(ind, levels = names(soil_local_filtered)), y = values)) + 
+ggplot(stack(soil_local_filtered_2), aes(x = factor(ind, levels = names(soil_local_filtered_2)), y = values)) + 
   geom_boxplot()+
   scale_x_discrete(name = "Soil local (Clay content, Sand content, Silt content)", labels = selected_values, guide = guide_axis(angle = 60)) + ylim(0.00, 100)
 
@@ -260,7 +271,7 @@ unique_subc_id <- unique(climate_local$subc_id)
 
 print(unique_subc_id)
 ```
-# no unique values in climate_local 
+# no not unique values in climate_local 
 ```{r}
 not_unique_subc_id <- table(as.character(climate_local$subc_id))
 
@@ -283,5 +294,4 @@ barplot(table(topography_local$strahler),
         border = "black",
         ylim = c(0, max_frequencies + 5))
 ```
- 
- 
+
