@@ -215,6 +215,7 @@ ggplot(stack(landcover_upstream_copy[ ,3:24]), aes(x = factor(ind, levels = name
   scale_x_discrete(name = "Landcover upstream", labels = selected_values, guide = guide_axis(angle = 60)) + ylim(0.00, 100)
 ```
 
+# filter by mean and continuous 
 ```{r}
 soil_local_filtered <- soil_local %>%
   select(awcts_mean,wwp_mean,orcdrc_mean,phihox_mean,bldfie_mean,cecsol_mean,crfvol_mean,acdwrb_mean,bdricm_mean,bdrlog_mean,histpr_mean,slgwrb_mean)
@@ -223,6 +224,62 @@ soil_upstream_filtered <- soil_upstream %>%
   select(awcts_mean,wwp_mean,orcdrc_mean,phihox_mean,bldfie_mean,cecsol_mean,crfvol_mean,acdwrb_mean,bdricm_mean,bdrlog_mean,histpr_mean,slgwrb_mean)
 ```
 
+# create histograms for soil_local with ggplot2
+# take the histogram names from environmental_variables
+```{r}
+# filter environmental_variables by Soil
+soil_variables <- filter(environmental_variables, Category == "Soil")
+# copy column names from soil_local_filtered
+soil_column_names <- names(soil_local_filtered)
+
+# remove "_mean"
+soil_column_names_split <- sapply(
+  soil_column_names, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+# create new subset without mean 
+soil_variables_subset <- subset(soil_variables, Abbreviation %in% soil_column_names_split) 
+# create a new data frame with only Abbreviation and Variable
+soil_variables_subset_filtered <- soil_variables_subset %>% select('Abbreviation', 'Variable')
+                                  soil_variables_subset %>% select(c('Abbreviation', 'Variable'))
+
+ 
+soil_local_filtered_norm <- data.frame(
+ID = 1:100,
+awcts_mean = rnorm(100),wwp_mean = rnorm(100),orcdrc_mean = rnorm(100),phihox_mean = rnorm(100),bldfie_mean = rnorm(100),cecsol_mean = rnorm(100),
+crfvol_mean = rnorm(100),acdwrb_mean = rnorm(100),bdricm_mean = rnorm(100),bdrlog_mean = rnorm(100),histpr_mean = rnorm(100),slgwrb_mean = rnorm(100))
+
+# melt data frame to make it readable for ggplot2
+soil_local_melted <- gather(soil_local_filtered_norm, key = "variable", value = "value", -ID)
+
+soil_local_melted$variable <- sapply(
+  soil_local_melted$variable, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+
+# convert two-column data frame to a named vector or list, using the first column as name and the second column as value
+variable_names <- deframe(soil_variables_subset_filtered)
+
+# create a labeller function, which will return the appropriate name when asked for one of the values of variable_names
+variable_labeller <- function(variable,value){
+  return(variable_names[value])
+}
+# create histograms
+# pass labeller function to the labeller argument of facet_wrap
+ggplot(soil_local_melted, aes(x = value)) +
+  geom_histogram(
+    binwidth = 1, 
+    fill = "skyblue", 
+    color = "black", 
+    alpha = 0.7) + 
+  facet_wrap(~variable, scales = "free", labeller = as_labeller(variable_names)) +
+  labs(title = "Histograms",
+       x = "Value",
+       y = "Frequency") +
+  theme_minimal()
+```
 
 # create histograms for soil_local and soil_upstream
 ```{r}
@@ -230,12 +287,13 @@ soil_upstream_filtered <- soil_upstream %>%
 par(mfrow = c(1, 2))  
 
 for (col_name in names(soil_local_filtered)) {
-  hist(soil_local_filtered[[col_name]],
+  hist(soil_upstream_filtered[[col_name]],
        main = paste("Histogram for", col_name),
        xlab = col_name,
        col = "skyblue",
        border = "black")
 }
+
 
 ```
 
