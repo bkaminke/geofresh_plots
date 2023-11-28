@@ -15,8 +15,6 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-
-# install Tidyverse-Package 
 # load all libaries
 ```{r}
 library(readr)
@@ -77,13 +75,12 @@ m <- m %>%
 (topography_upstream <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-topography-upstream.csv"))
 ```
 
-
 # load environmental_variables CSV-Data 
 ```{r}
 (environmental_variables <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh_environmental_variables - env_var_for_plots.csv"))
 ```
 
-# filter by mean  
+# filter climate_local and upstream by mean  
 ```{r}
 climate_local_filtered <- climate_local %>%
   select(bio1_mean,bio2_mean,bio3_mean,bio4_mean,bio5_mean,bio6_mean,bio7_mean,bio8_mean,bio9_mean,bio10_mean,bio11_mean,bio12_mean,bio13_mean,bio14_mean,bio15_mean,bio16_mean,bio17_mean,bio18_mean,bio19_mean)
@@ -98,7 +95,8 @@ climate_upstream_filtered <- climate_upstream %>%
 print(climate_upstream_filtered)
 ```
 
-# create histograms for climate_local and climate_upstream
+# create histograms without ggplot2
+# just an example, not used in our case 
 ```{r}
 # climate_local
 # Create histograms for each column and display them in a row
@@ -111,8 +109,8 @@ for (col_name in names(climate_local_filtered)) {
        col = "skyblue",
        border = "black")
 }
-```
 
+```
 ```{r}
 # climate_upstream
 par(mfrow = c(1, 2))  
@@ -125,6 +123,99 @@ for (col_name in names(climate_upstream_filtered)) {
        border = "black")
 }
 ```
+
+
+# create histograms for climate_local with ggplot2
+# use the histogram names (Variables) from environmental_variables
+```{r}
+# filter environmental_variables by Climate
+climate_variables <- filter(environmental_variables, Category == "Climate")
+# copy column names from climate_local_filtered
+climate_local_column_names <- names(climate_local_filtered)
+# remove "_mean"
+climate_local_column_names_split <- sapply(
+  climate_local_column_names, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+# create new subset without mean 
+climate_local_variables_subset <- subset(climate_variables, Abbreviation %in% climate_local_column_names_split) 
+# create a new data frame with only Abbreviation and Variable
+climate_local_variables_subset_filtered <- climate_local_variables_subset %>% select('Abbreviation', 'Variable')
+                                  climate_local_variables_subset %>% select(c('Abbreviation', 'Variable'))
+                                  
+climate_local_filtered_norm <- data.frame(ID = 1:100,bio1_mean = rnorm(100),bio2_mean = rnorm(100),bio3_mean = rnorm(100),bio4_mean = rnorm(100),bio5_mean = rnorm(100),bio6_mean = rnorm(100),bio7_mean = rnorm(100),bio8_mean = rnorm(100),bio9_mean = rnorm(100),bio10_mean = rnorm(100),bio11_mean = rnorm(100),bio12_mean = rnorm(100),bio13_mean = rnorm(100),bio14_mean = rnorm(100),bio15_mean = rnorm(100),bio16_mean = rnorm(100),bio17_mean = rnorm(100),bio18_mean = rnorm(100),bio19_mean = rnorm(100))
+# melt data frame to make it readable for ggplot2
+climate_local_melted <- gather(climate_local_filtered_norm, key = "variable", value = "value", -ID)
+
+climate_local_melted$variable <- sapply(
+  climate_local_melted$variable, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+# convert two-column data frame to a named vector or list, using the first column as name and the second column as value
+variable_names <- deframe(climate_local_variables_subset_filtered)
+# create a labeller function, which will return the appropriate name when asked for one of the values of variable_names
+variable_labeller <- function(variable,value){
+  return(variable_names[value])
+}
+# create histograms
+# pass labeller function to the labeller argument of facet_wrap
+ggplot(climate_local_melted, aes(x = value)) +
+  geom_histogram(
+    binwidth = 1, 
+    fill = "skyblue", 
+    color = "black", 
+    alpha = 0.7) + 
+  facet_wrap(~variable, scales = "free", labeller = as_labeller(variable_names)) +
+  labs(title = "Histograms",
+       x = "Value",
+       y = "Frequency") +
+  theme_minimal()
+```
+
+# create histograms for climate_upstream with ggplot2
+```{r}
+climate_variables <- filter(environmental_variables, Category == "Climate")
+
+climate_upstream_column_names <- names(climate_upstream_filtered)
+
+climate_upstream_column_names_split <- sapply(
+  climate_upstream_column_names, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+climate_upstream_variables_subset <- subset(climate_variables, Abbreviation %in% climate_upstream_column_names_split) 
+
+climate_upstream_variables_subset_filtered <- climate_upstream_variables_subset %>% select('Abbreviation', 'Variable')
+                                  climate_upstream_variables_subset %>% select(c('Abbreviation', 'Variable'))
+                                  
+climate_upstream_filtered_norm <- data.frame(ID = 1:100,bio1_mean = rnorm(100),bio2_mean = rnorm(100),bio3_mean = rnorm(100),bio4_mean = rnorm(100),bio5_mean = rnorm(100),bio6_mean = rnorm(100),bio7_mean = rnorm(100),bio8_mean = rnorm(100),bio9_mean = rnorm(100),bio10_mean = rnorm(100),bio11_mean = rnorm(100),bio12_mean = rnorm(100),bio13_mean = rnorm(100),bio14_mean = rnorm(100),bio15_mean = rnorm(100),bio16_mean = rnorm(100),bio17_mean = rnorm(100),bio18_mean = rnorm(100),bio19_mean = rnorm(100))
+
+climate_upstream_melted <- gather(climate_upstream_filtered_norm, key = "variable", value = "value", -ID)
+
+climate_upstream_melted$variable <- sapply(
+  climate_upstream_melted$variable, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+variable_names <- deframe(climate_upstream_variables_subset_filtered)
+variable_labeller <- function(variable,value){
+  return(variable_names[value])
+}
+ggplot(climate_upstream_melted, aes(x = value)) +
+  geom_histogram(
+    binwidth = 1, 
+    fill = "skyblue", 
+    color = "black", 
+    alpha = 0.7) + 
+  facet_wrap(~variable, scales = "free", labeller = as_labeller(variable_names)) +
+  labs(title = "Histograms",
+       x = "Value",
+       y = "Frequency") +
+  theme_minimal()
+```
+
 
 # filter by mean and continuous 
 ```{r}
@@ -140,31 +231,88 @@ topography_upstream_filtered <- topography_upstream %>%
 print(topography_upstream_filtered)
 ```
 
-# Create histograms for topography_local_filtered and topography_upstream_filtered
+# create histograms for topography_local with ggplot2
 ```{r}
-# topography_local_filtered
-par(mfrow = c(1, 2))  
+topography_variables <- filter(environmental_variables, Category == "Topography")
 
-for (col_name in names(topography_local_filtered)) {
-  hist(topography_local_filtered[[col_name]],
-       main = paste("Histogram for", col_name),
-       xlab = col_name,
-       col = "skyblue",
-       border = "black")
+topography_local_column_names <- names(topography_local_filtered)
+
+topography_local_column_names_split <- sapply(
+  topography_local_column_names, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+topography_local_variables_subset <- subset(topography_variables, Abbreviation %in% topography_local_column_names_split) 
+
+topography_local_variables_subset_filtered <- topography_local_variables_subset %>% select('Abbreviation', 'Variable')
+                                  topography_local_variables_subset %>% select(c('Abbreviation', 'Variable'))
+                                  
+topography_local_filtered_norm <- data.frame(ID = 1:100,elev_mean = rnorm(100),flowpos_mean = rnorm(100),spi_mean = rnorm(100),sti_mean = rnorm(100),cti_mean = rnorm(100))
+
+topography_local_melted <- gather(topography_local_filtered_norm, key = "variable", value = "value", -ID)
+
+topography_local_melted$variable <- sapply(
+  topography_local_melted$variable, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+variable_names <- deframe(topography_local_variables_subset_filtered)
+variable_labeller <- function(variable,value){
+  return(variable_names[value])
 }
+ggplot(topography_local_melted, aes(x = value)) +
+  geom_histogram(
+    binwidth = 1, 
+    fill = "skyblue", 
+    color = "black", 
+    alpha = 0.7) + 
+  facet_wrap(~variable, scales = "free", labeller = as_labeller(variable_names)) +
+  labs(title = "Histograms",
+       x = "Value",
+       y = "Frequency") +
+  theme_minimal()
 ```
 
+# create histograms for topography_upstream with ggplot2
 ```{r}
-# topography_upstream
-par(mfrow = c(1, 2))  
+topography_variables <- filter(environmental_variables, Category == "Topography")
 
-for (col_name in names(topography_upstream_filtered)) {
-  hist(topography_upstream_filtered[[col_name]],
-       main = paste("Histogram for", col_name),
-       xlab = col_name,
-       col = "skyblue",
-       border = "black")
+topography_upstream_column_names <- names(topography_upstream_filtered)
+
+topography_upstream_column_names_split <- sapply(
+  topography_upstream_column_names, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+topography_upstream_variables_subset <- subset(topography_variables, Abbreviation %in% topography_upstream_column_names_split) 
+
+topography_upstream_variables_subset_filtered <- topography_upstream_variables_subset %>% select('Abbreviation', 'Variable')
+                                  topography_upstream_variables_subset %>% select(c('Abbreviation', 'Variable'))
+                                  
+topography_upstream_filtered_norm <- data.frame(ID = 1:100,elev_mean = rnorm(100),flowpos_mean = rnorm(100),spi_mean = rnorm(100),sti_mean = rnorm(100),cti_mean = rnorm(100))
+
+topography_upstream_melted <- gather(topography_upstream_filtered_norm, key = "variable", value = "value", -ID)
+
+topography_upstream_melted$variable <- sapply(
+  topography_upstream_melted$variable, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+variable_names <- deframe(topography_upstream_variables_subset_filtered)
+variable_labeller <- function(variable,value){
+  return(variable_names[value])
 }
+ggplot(topography_upstream_melted, aes(x = value)) +
+  geom_histogram(
+    binwidth = 1, 
+    fill = "skyblue", 
+    color = "black", 
+    alpha = 0.7) + 
+  facet_wrap(~variable, scales = "free", labeller = as_labeller(variable_names)) +
+  labs(title = "Histograms",
+       x = "Value",
+       y = "Frequency") +
+  theme_minimal()
 ```
 
 # create boxplots for landcover_local
@@ -227,30 +375,25 @@ soil_upstream_filtered <- soil_upstream %>%
 # create histograms for soil_local with ggplot2
 # take the histogram names from environmental_variables
 ```{r}
-# filter environmental_variables by Soil
 soil_variables <- filter(environmental_variables, Category == "Soil")
-# copy column names from soil_local_filtered
-soil_column_names <- names(soil_local_filtered)
 
-# remove "_mean"
-soil_column_names_split <- sapply(
-  soil_column_names, 
+soil_local_column_names <- names(soil_local_filtered)
+
+soil_local_column_names_split <- sapply(
+  soil_local_column_names, 
   function(x) strsplit(x, "_")[[1]][1],
   USE.NAMES = FALSE
   )
-# create new subset without mean 
-soil_variables_subset <- subset(soil_variables, Abbreviation %in% soil_column_names_split) 
-# create a new data frame with only Abbreviation and Variable
-soil_variables_subset_filtered <- soil_variables_subset %>% select('Abbreviation', 'Variable')
-                                  soil_variables_subset %>% select(c('Abbreviation', 'Variable'))
+soil_local_variables_subset <- subset(soil_variables, Abbreviation %in% soil_local_column_names_split) 
 
- 
-soil_local_filtered_norm <- data.frame(
-ID = 1:100,
-awcts_mean = rnorm(100),wwp_mean = rnorm(100),orcdrc_mean = rnorm(100),phihox_mean = rnorm(100),bldfie_mean = rnorm(100),cecsol_mean = rnorm(100),
-crfvol_mean = rnorm(100),acdwrb_mean = rnorm(100),bdricm_mean = rnorm(100),bdrlog_mean = rnorm(100),histpr_mean = rnorm(100),slgwrb_mean = rnorm(100))
+soil_local_variables_subset_filtered <- soil_local_variables_subset %>% select('Abbreviation', 'Variable')
+                                  soil_local_variables_subset %>% select(c('Abbreviation', 'Variable'))
 
-# melt data frame to make it readable for ggplot2
+soil_local_filtered_norm <- data.frame(ID = 1:100,awcts_mean = rnorm(100),wwp_mean = rnorm(100),
+orcdrc_mean = rnorm(100),phihox_mean = rnorm(100),bldfie_mean = rnorm(100),cecsol_mean = rnorm(100),
+crfvol_mean = rnorm(100),acdwrb_mean = rnorm(100),bdricm_mean = rnorm(100),bdrlog_mean = rnorm(100),
+histpr_mean = rnorm(100),slgwrb_mean = rnorm(100))
+
 soil_local_melted <- gather(soil_local_filtered_norm, key = "variable", value = "value", -ID)
 
 soil_local_melted$variable <- sapply(
@@ -258,16 +401,11 @@ soil_local_melted$variable <- sapply(
   function(x) strsplit(x, "_")[[1]][1],
   USE.NAMES = FALSE
   )
+variable_names <- deframe(soil_local_variables_subset_filtered)
 
-# convert two-column data frame to a named vector or list, using the first column as name and the second column as value
-variable_names <- deframe(soil_variables_subset_filtered)
-
-# create a labeller function, which will return the appropriate name when asked for one of the values of variable_names
 variable_labeller <- function(variable,value){
   return(variable_names[value])
 }
-# create histograms
-# pass labeller function to the labeller argument of facet_wrap
 ggplot(soil_local_melted, aes(x = value)) +
   geom_histogram(
     binwidth = 1, 
@@ -281,33 +419,50 @@ ggplot(soil_local_melted, aes(x = value)) +
   theme_minimal()
 ```
 
-# create histograms for soil_local and soil_upstream
+# create histograms for soil_upstream with ggplot2
 ```{r}
-# soil_local_filtered
-par(mfrow = c(1, 2))  
+soil_variables <- filter(environmental_variables, Category == "Soil")
 
-for (col_name in names(soil_local_filtered)) {
-  hist(soil_upstream_filtered[[col_name]],
-       main = paste("Histogram for", col_name),
-       xlab = col_name,
-       col = "skyblue",
-       border = "black")
+soil_upstream_column_names <- names(soil_upstream_filtered)
+
+soil_upstream_column_names_split <- sapply(
+  soil_upstream_column_names, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+soil_upstream_variables_subset <- subset(soil_variables, Abbreviation %in% soil_upstream_column_names_split) 
+
+soil_upstream_variables_subset_filtered <- soil_upstream_variables_subset %>% select('Abbreviation', 'Variable')
+                                  soil_upstream_variables_subset %>% select(c('Abbreviation', 'Variable'))
+                                  
+soil_upstream_filtered_norm <- data.frame(ID = 1:100,awcts_mean = rnorm(100),wwp_mean = rnorm(100),
+orcdrc_mean = rnorm(100),phihox_mean = rnorm(100),bldfie_mean = rnorm(100),cecsol_mean = rnorm(100),
+crfvol_mean = rnorm(100),acdwrb_mean = rnorm(100),bdricm_mean = rnorm(100),bdrlog_mean = rnorm(100),
+histpr_mean = rnorm(100),slgwrb_mean = rnorm(100))
+
+soil_upstream_melted <- gather(soil_upstream_filtered_norm, key = "variable", value = "value", -ID)
+
+soil_upstream_melted$variable <- sapply(
+  soil_upstream_melted$variable, 
+  function(x) strsplit(x, "_")[[1]][1],
+  USE.NAMES = FALSE
+  )
+variable_names <- deframe(soil_upstream_variables_subset_filtered)
+variable_labeller <- function(variable,value){
+  return(variable_names[value])
 }
+ggplot(soil_upstream_melted, aes(x = value)) +
+  geom_histogram(
+    binwidth = 1, 
+    fill = "skyblue", 
+    color = "black", 
+    alpha = 0.7) + 
+  facet_wrap(~variable, scales = "free", labeller = as_labeller(variable_names)) +
+  labs(title = "Histograms",
+       x = "Value",
+       y = "Frequency") +
+  theme_minimal()
 
-
-```
-
-```{r}
-# soil_upstream_filtered
-par(mfrow = c(1, 2))  
-
-for (col_name in names(soil_upstream_filtered)) {
-  hist(soil_upstream_filtered[[col_name]],
-       main = paste("Histogram for", col_name),
-       xlab = col_name,
-       col = "skyblue",
-       border = "black")
-}
 ```
 
 # create boxplots for the columns clyppt (Clay content), sndppt (Sand content), sltppt (Silt content) from soil_local 
