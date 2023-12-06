@@ -366,10 +366,10 @@ ggplot(stack(landcover_upstream_copy[ ,3:24]), aes(x = factor(ind, levels = name
 # filter by mean and continuous 
 ```{r}
 soil_local_filtered <- soil_local %>%
-  select(awcts_mean,wwp_mean,orcdrc_mean,phihox_mean,bldfie_mean,cecsol_mean,crfvol_mean,acdwrb_mean,bdricm_mean,bdrlog_mean,histpr_mean,slgwrb_mean)
+  select(awcts_mean,wwp_mean,orcdrc_mean,phihox_mean,bldfie_mean,cecsol_mean,crfvol_mean,acdwrb_mean,bdricm_mean,bdrlog_mean,histpr_mean)
 
 soil_upstream_filtered <- soil_upstream %>%
-  select(awcts_mean,wwp_mean,orcdrc_mean,phihox_mean,bldfie_mean,cecsol_mean,crfvol_mean,acdwrb_mean,bdricm_mean,bdrlog_mean,histpr_mean,slgwrb_mean)
+  select(awcts_mean,wwp_mean,orcdrc_mean,phihox_mean,bldfie_mean,cecsol_mean,crfvol_mean,acdwrb_mean,bdricm_mean,bdrlog_mean,histpr_mean)
 ```
 
 # create histograms for soil_local with ggplot2
@@ -392,7 +392,7 @@ soil_local_variables_subset_filtered <- soil_local_variables_subset %>% select('
 soil_local_filtered_norm <- data.frame(ID = 1:100,awcts_mean = rnorm(100),wwp_mean = rnorm(100),
 orcdrc_mean = rnorm(100),phihox_mean = rnorm(100),bldfie_mean = rnorm(100),cecsol_mean = rnorm(100),
 crfvol_mean = rnorm(100),acdwrb_mean = rnorm(100),bdricm_mean = rnorm(100),bdrlog_mean = rnorm(100),
-histpr_mean = rnorm(100),slgwrb_mean = rnorm(100))
+histpr_mean = rnorm(100))
 
 soil_local_melted <- gather(soil_local_filtered_norm, key = "variable", value = "value", -ID)
 
@@ -438,7 +438,7 @@ soil_upstream_variables_subset_filtered <- soil_upstream_variables_subset %>% se
 soil_upstream_filtered_norm <- data.frame(ID = 1:100,awcts_mean = rnorm(100),wwp_mean = rnorm(100),
 orcdrc_mean = rnorm(100),phihox_mean = rnorm(100),bldfie_mean = rnorm(100),cecsol_mean = rnorm(100),
 crfvol_mean = rnorm(100),acdwrb_mean = rnorm(100),bdricm_mean = rnorm(100),bdrlog_mean = rnorm(100),
-histpr_mean = rnorm(100),slgwrb_mean = rnorm(100))
+histpr_mean = rnorm(100))
 
 soil_upstream_melted <- gather(soil_upstream_filtered_norm, key = "variable", value = "value", -ID)
 
@@ -468,7 +468,7 @@ ggplot(soil_upstream_melted, aes(x = value)) +
 # create boxplots for the columns clyppt (Clay content), sndppt (Sand content), sltppt (Silt content) from soil_local 
 ```{r}
 soil_local_filtered_2 <- soil_local %>%
-  select(clyppt_mean,sndppt_mean,sltppt_mean)
+  select(clyppt_mean,sndppt_mean,sltppt_mean,slgwrb_mean)
 
 selected_values <- environmental_variables$Variable[67:69]
 
