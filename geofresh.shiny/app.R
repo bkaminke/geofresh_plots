@@ -1,11 +1,6 @@
-#
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+# Find out more about building applications with Shiny here: http://shiny.rstudio.com/
 
 library(shiny)
 library(shinythemes)
@@ -20,7 +15,7 @@ SoilLo <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-
 SoilUp <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-soil-upstream.csv")
 TopographyLo <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-topography-local.csv")
 TopographyUp <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-topography-upstream.csv")
-EnvironmentalVariables <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh_environmental_variables - env_var_for_plots.csv")
+EnvironmentalVariables <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh_environmental_variables - sheet1_long.csv")
 
 # transfer variable names from EnvironmentalVariables
 # climate
@@ -77,13 +72,21 @@ joined_soil <- left_join(
 
 named_soil <- deframe(joined_soil)
 
-#named_soil_filtered <- named_soil %>%
-  #select('Derived saturated water content', 'Derived available soil water capacity,Soil organic carbon content',
-         #'Soil pH x 10 in H2O, Bulk density', 'Cation exchange capacity', 'Coarse fragments volumetric', 
-         #'Grade of a sub-soil being acid', 'Depth to bedrock ,Probability of occurence of R horizon',
-         #'Cumulative probability of organic soil')
+# landcover
+col_landcover <- as_tibble_col(
+  colnames(LandcoverLo)[grepl("^c", colnames(LandcoverLo))],
+  column_name = "abbreviation"
+)
 
+joined_landcover <- left_join(
+  col_landcover,
+  EnvironmentalVariables,
+  by = join_by(abbreviation == Abbreviation)
+) %>% select("Variable", "abbreviation")
 
+named_landcover <- deframe(joined_landcover)
+
+# Ui
 ui <- fluidPage(
   theme = shinytheme("cerulean"),
 
@@ -95,7 +98,7 @@ ui <- fluidPage(
     tabPanel("Home", "Welcome to the GeoFresh Tutorial Points App!",
       "For this example, we will use a random subset of 100 occurrence points,
          drawn from the Harmonised freshwater fish occurrence and abundance data for 12 federal states in Germany, downloaded from GBIF.",
-      "The points are visualized on the map.", "Select a specific tab to explore various environmental variables for the tutorial points.", "You can find more information on the GeoFresh website.",
+      "The points are visualized on the map.", "Select a specific tab to explore the environmental variables for the tutorial points.", "You can find more information on the GeoFresh website.",
       h3("Map"),
       fluidPage(leafletOutput("map")),
       div(style = "height: 10px;"),
@@ -116,7 +119,7 @@ ui <- fluidPage(
             value = 30
           ),
           selectInput("localColumn", "Select Column for Local Data:",
-            choices = named_climate,
+            choices = named_climate
           ),
           sliderInput("upstreamBins", "Number of Bins (upstream):",
             min = 1,
@@ -124,7 +127,7 @@ ui <- fluidPage(
             value = 30
           ),
           selectInput("upstreamColumn", "Select Column for Upstream Data:",
-            choices = named_climate,
+            choices = named_climate
           )
         ),
         mainPanel(
@@ -145,7 +148,7 @@ ui <- fluidPage(
             value = 30
           ),
           selectInput("topographyLocalColumn", "Select Column for Local Data:",
-            choices = named_topography,
+            choices = named_topography
           ),
           sliderInput("topographyUpstreamBins", "Number of Bins (upstream):",
             min = 1,
@@ -153,8 +156,8 @@ ui <- fluidPage(
             value = 30
           ),
           selectInput("topographyUpstreamColumn", "Select Column for Upstream Data:",
-            choices = named_topography,
-          )
+            choices = named_topography
+          ),
         ),
         mainPanel(
           plotOutput("topographyLocalDistPlot"),
@@ -174,8 +177,7 @@ ui <- fluidPage(
             max = 50,
             value = 30
           ),
-          selectInput("soilLocalColumn",
-            "Select Column for Local Data:",
+          selectInput("soilLocalColumn", "Select Column for Local Data:",
             choices = named_soil
           ),
           sliderInput("soilUpstreamBins", "Number of Bins (upstream):",
@@ -183,18 +185,13 @@ ui <- fluidPage(
             max = 50,
             value = 30
           ),
-          selectInput("soilUpstreamColumn",
-            "Select Column for Upstream Data:",
-            choices = c(
-              "awcts_mean", "wwp_mean", "orcdrc_mean", "phihox_mean", "bldfie_mean", "cecsol_mean",
-              "crfvol_mean", "acdwrb_mean", "bdricm_mean", "bdrlog_mean", "histpr_mean"
-            ),
+          selectInput("soilUpstreamColumn", "Select Column for Upstream Data:",
+            choices = named_soil
           )
         ),
         mainPanel(
           plotOutput("soilLocalDistPlot"),
-          plotOutput("soilUpstreamDistPlot"),
-          plotOutput("soilBoxplot")
+          plotOutput("soilUpstreamDistPlot")
         )
       )
     ),
@@ -204,21 +201,20 @@ ui <- fluidPage(
       "Landcover",
       sidebarLayout(
         sidebarPanel(
-          tags$style(HTML(".checkbox-inline { display: inline-block; margin-right: 60px; }")),
+          tags$style(HTML(".checkbox-inline { display: inline-block; margin-right: 100px; }")),
           checkboxGroupInput("Landcoverlocal", "Choose columns for Landcover local data:",
-            choices = colnames(LandcoverLo)[grepl("^c", colnames(LandcoverLo))],
+            choices = named_landcover,
             selected = colnames(LandcoverLo),
             inline = TRUE
           ),
           checkboxGroupInput("Landcoverupstream",
             "Choose columns for Landcover upstream data:",
-            choices = colnames(LandcoverUp)[grepl("^c", colnames(LandcoverUp))],
+            choices = named_landcover,
             selected = colnames(LandcoverUp),
             inline = TRUE
           )
         ),
-        mainPanel
-        (
+        mainPanel(
           plotOutput("landcoverLocalDistPlot"),
           plotOutput("landcoverUpstreamDistPlot")
         )
@@ -226,6 +222,8 @@ ui <- fluidPage(
     )
   )
 )
+
+
 
 # Server
 server <- function(input, output) {
@@ -256,7 +254,7 @@ server <- function(input, output) {
     hist(x,
       breaks = bins, col = "#75AADB", border = "black",
       xlab = input$localColumn,
-      main = paste("Histogram of", input$localColumn, "local")
+      main = paste("Histogram of", names(named_climate)[named_climate == input$localColumn], "(local)")
     )
   })
 
@@ -268,7 +266,7 @@ server <- function(input, output) {
     hist(x,
       breaks = bins, col = "#75AADB", border = "black",
       xlab = input$upstreamColumn,
-      main = paste("Histogram of", input$upstreamColumn, "upstream")
+      main = paste("Histogram of", names(named_climate)[named_climate == input$upstreamColumn], "(upstream)")
     )
   })
 
@@ -281,7 +279,7 @@ server <- function(input, output) {
     hist(x,
       breaks = bins, col = "#75AADB", border = "black",
       xlab = input$soilLocalColumn,
-      main = paste("Histogram of", input$soilLocalColumn, "local")
+      main = paste("Histogram of", names(named_soil)[named_soil == input$soilLocalColumn], "(local)")
     )
   })
 
@@ -293,13 +291,8 @@ server <- function(input, output) {
     hist(x,
       breaks = bins, col = "#75AADB", border = "black",
       xlab = input$soilUpstreamColumn,
-      main = paste("Histogram of", input$soilUpstreamColumn, "upstream")
+      main = paste("Histogram of", names(named_soil)[named_soil == input$soilUpstreamColumn], "(upstream)")
     )
-  })
-
-  output$soilBoxplot <- renderPlot({
-    selected_columns <- c("clyppt_mean", "sndppt_mean", "sltppt_mean", "slgwrb_mean")
-    boxplot(SoilLo[, selected_columns], main = "Boxplot of selected Soil columns")
   })
 
   # Topography
@@ -311,7 +304,7 @@ server <- function(input, output) {
     hist(x,
       breaks = bins, col = "#75AADB", border = "black",
       xlab = input$topographyLocalColumn,
-      main = paste("Histogram of", input$topographyLocalColumn, "local")
+      main = paste("Histogram of", names(named_topography)[named_topography == input$topographyLocalColumn], "(local)")
     )
   })
 
@@ -323,7 +316,7 @@ server <- function(input, output) {
     hist(x,
       breaks = bins, col = "#75AADB", border = "black",
       xlab = input$topographyUpstreamColumn,
-      main = paste("Histogram of", input$topographyUpstreamColumn, "upstream")
+      main = paste("Histogram of", names(named_topography)[named_topography == input$topographyUpstreamColumn], "(upstream)")
     )
   })
 
@@ -343,7 +336,7 @@ server <- function(input, output) {
   # Output Landcover Boxplots
   output$landcoverLocalDistPlot <- renderPlot({
     selected_columns <- input$Landcoverlocal
-    boxplot(LandcoverLo[, selected_columns], main = "Landcover local ")
+    boxplot(LandcoverLo[, selected_columns], main = "Landcover local")
   })
 
   output$landcoverUpstreamDistPlot <- renderPlot({
