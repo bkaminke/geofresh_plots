@@ -5,86 +5,8 @@
 library(shiny)
 library(shinythemes)
 library(DT)
-
-TutorialPoints <- read.csv("U:/R-Studio/geofresh_plots/data/tutorial_points.csv")
-ClimateLo <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-climate-local.csv")
-ClimateUp <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-climate-upstream.csv")
-LandcoverLo <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-land-cover-local.csv")
-LandcoverUp <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-land-cover-upstream.csv")
-SoilLo <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-soil-local.csv")
-SoilUp <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-soil-upstream.csv")
-TopographyLo <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-topography-local.csv")
-TopographyUp <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh-2023-11-13-env-var-topography-upstream.csv")
-EnvironmentalVariables <- read.csv("U:/R-Studio/geofresh_plots/data/geofresh_environmental_variables - sheet1_long.csv")
-
-# transfer variable names from EnvironmentalVariables
-# climate
-col_climate <- as_tibble_col(
-  colnames(ClimateLo)[endsWith(colnames(ClimateLo), "_mean")],
-  column_name = "abbreviation_mean"
-)
-col_climate$abbreviation <- sapply(
-  col_climate$abbreviation_mean,
-  function(x) strsplit(x, "_")[[1]][1],
-  USE.NAMES = FALSE
-)
-joined_climate <- left_join(
-  col_climate,
-  EnvironmentalVariables,
-  by = join_by(abbreviation == Abbreviation)
-) %>% select("Variable", "abbreviation_mean")
-
-named_climate <- deframe(joined_climate)
-
-# topography
-col_topography <- as_tibble_col(
-  colnames(TopographyLo)[endsWith(colnames(TopographyLo), "_mean")],
-  column_name = "abbreviation_mean"
-)
-col_topography$abbreviation <- sapply(
-  col_topography$abbreviation_mean,
-  function(x) strsplit(x, "_")[[1]][1],
-  USE.NAMES = FALSE
-)
-joined_topography <- left_join(
-  col_topography,
-  EnvironmentalVariables,
-  by = join_by(abbreviation == Abbreviation)
-) %>% select("Variable", "abbreviation_mean")
-
-named_topography <- deframe(joined_topography)
-
-# soil
-col_soil <- as_tibble_col(
-  colnames(SoilLo)[endsWith(colnames(SoilLo), "_mean")],
-  column_name = "abbreviation_mean"
-)
-col_soil$abbreviation <- sapply(
-  col_soil$abbreviation_mean,
-  function(x) strsplit(x, "_")[[1]][1],
-  USE.NAMES = FALSE
-)
-joined_soil <- left_join(
-  col_soil,
-  EnvironmentalVariables,
-  by = join_by(abbreviation == Abbreviation)
-) %>% select("Variable", "abbreviation_mean")
-
-named_soil <- deframe(joined_soil)
-
-# landcover
-col_landcover <- as_tibble_col(
-  colnames(LandcoverLo)[grepl("^c", colnames(LandcoverLo))],
-  column_name = "abbreviation"
-)
-
-joined_landcover <- left_join(
-  col_landcover,
-  EnvironmentalVariables,
-  by = join_by(abbreviation == Abbreviation)
-) %>% select("Variable", "abbreviation")
-
-named_landcover <- deframe(joined_landcover)
+library(ggplot2)
+library(leaflet)
 
 # Ui
 ui <- fluidPage(
