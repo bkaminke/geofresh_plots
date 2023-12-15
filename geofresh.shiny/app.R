@@ -20,7 +20,8 @@ ui <- fluidPage(
     tabPanel("Home", "Welcome to the GeoFresh Tutorial Points App!",
       "For this example, we will use a random subset of 100 occurrence points,
          drawn from the Harmonised freshwater fish occurrence and abundance data for 12 federal states in Germany, downloaded from GBIF.",
-      "The points are visualized on the map.", "Select a specific tab to explore the environmental variables for the tutorial points.", "You can find more information on the GeoFresh website.",
+      "The points are visualized on the map.", "Select a specific tab to explore the environmental variables for the tutorial points.",
+      "For more Information please see: http://geofresh.org/.",
       h3("Map"),
       fluidPage(leafletOutput("map")),
       div(style = "height: 10px;"),
@@ -142,10 +143,17 @@ ui <- fluidPage(
         )
       )
     )
-  )
+  ),
+  # Citation
+  verbatimTextOutput("citation"),
+  tags$style(HTML("
+    #citation {
+      font-family: 'Arial', sans-serif;
+      margin-top: 40px;
+    }
+  ")
 )
-
-
+)
 
 # Server
 server <- function(input, output) {
@@ -264,6 +272,11 @@ server <- function(input, output) {
   output$landcoverUpstreamDistPlot <- renderPlot({
     selected_columns <- input$Landcoverupstream
     boxplot(LandcoverUp[, selected_columns], main = "Landcover upstream")
+  })
+  
+  #Citation
+  output$citation <- renderPrint({
+    cat("The data in this app is based on the GeoFRESH platform, published by: Domisch, S., Bremerich, V., Torres-Cambas, Y., Grigoropoulou, A., Garcia Marquez, J.R., Amatulli, G., De Meester, L., Grossart, H.-P. , Gessner, M., Mehner, T. & Adrian, R. (2023). Raumzeitliche Süßwasserdaten auf den richtigen Weg bringen – hin zur Interoperabilität süßwasserspezifischer Daten. Zenodo. https://doi.org/10.5281/zenodo.7888389.")
   })
 }
 # Create the Shiny App
