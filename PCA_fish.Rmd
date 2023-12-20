@@ -19,67 +19,88 @@ library(stats)
 
 ```{r}
 (lota_clim_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-lota_lota-env-var-climate-local.csv"))
-```
-
-```{r}
+(lota_clim_up <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-lota_lota-env-var-climate-upstream.csv"))
 (lota_topo_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-lota_lota-env-var-topography-local.csv"))
-```
-
-```{r}
+(lota_topo_up <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-lota_lota-env-var-topography-upstream.csv"))
 (salmo_clim_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-salmo_trutta-env-var-climate-local.csv"))
-```
-
-```{r}
+(salmo_clim_up <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-salmo_trutta-env-var-climate-upstream.csv"))
 (salmo_topo_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-salmo_trutta-env-var-topography-local.csv"))
-```
-
-```{r}
+(salmo_topo_up <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-salmo_trutta-env-var-topography-upstream.csv"))
 (esox_clim_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-esox_lucius-env-var-climate-local.csv"))
-```
-
-```{r}
+(esox_clim_up <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-esox_lucius-env-var-climate-upstream.csv"))
 (esox_topo_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-esox_lucius-env-var-topography-local.csv"))
+(esox_topo_up <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-esox_lucius-env-var-topography-upstream.csv"))
 ```
 
 ```{r}
 # filter for mean 
 lota_clim_lo_mean <- lota_clim_lo %>%
-  select(bio1_mean,bio12_mean,bio15_mean)
+  select(id,bio1_mean,bio12_mean,bio15_mean)
+lota_clim_up_mean <- lota_clim_up %>%
+  select(id,bio1_mean,bio12_mean,bio15_mean)
+lota_topo_lo_mean <- lota_topo_lo %>% select(id,elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
+lota_topo_up_mean <- lota_topo_up %>% select(id,elev_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean) 
 
-lota_topo_lo_mean <- lota_topo_lo %>% select(elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
+salmo_clim_lo_mean <- salmo_clim_lo %>%
+  select(id,bio1_mean,bio12_mean,bio15_mean)
+salmo_clim_up_mean <- salmo_clim_up %>%
+  select(id,bio1_mean,bio12_mean,bio15_mean)
+salmo_topo_lo_mean <- salmo_topo_lo %>% select(id,elev_mean, flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
+salmo_topo_up_mean <- salmo_topo_up %>% select(id,elev_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean) 
 
-salmo_clim_lo_mean <- lota_clim_lo %>%
-  select(bio1_mean,bio12_mean,bio15_mean)
-
-salmo_topo_lo_mean <- lota_topo_lo %>% select(elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
-
-esox_clim_lo_mean <- lota_clim_lo %>%
-  select(bio1_mean,bio12_mean,bio15_mean)
-
-esox_topo_lo_mean <- lota_topo_lo %>% select(elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
+esox_clim_lo_mean <- esox_clim_lo %>%
+  select(id,bio1_mean,bio12_mean,bio15_mean)
+esox_clim_up_mean <- esox_clim_up %>%
+  select(id,bio1_mean,bio12_mean,bio15_mean)
+esox_topo_lo_mean <- esox_topo_lo %>% select(id,elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
+esox_topo_up_mean <- esox_topo_lo %>% select(id,elev_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean)
 ```
 
 ```{r}
 # add "Species" column 
-lota_clim_lo_mean <- lota_clim_lo_mean%>% mutate(Species = "Lota lota")
 lota_topo_lo_mean <- lota_topo_lo_mean%>% mutate(Species = "Lota lota")
+lota_topo_up_mean <- lota_topo_up_mean%>% mutate(Species = "Lota lota")
 
-salmo_clim_lo_mean <- salmo_clim_lo_mean%>% mutate(Species = "Salmo trutta")
 salmo_topo_lo_mean <- salmo_topo_lo_mean%>% mutate(Species = "Salmo trutta")
+salmo_topo_up_mean <- salmo_topo_up_mean%>% mutate(Species = "Salmo trutta")
 
-esox_clim_lo_mean <- esox_clim_lo_mean%>% mutate(Species = "Esox lucius")
 esox_topo_lo_mean <- esox_topo_lo_mean%>% mutate(Species = "Esox lucius")
+esox_topo_up_mean <- esox_topo_up_mean%>% mutate(Species = "Esox lucius")
 ```
 
 ```{r}
 # merge climate and topography dataframes to one joint dataframe 
-lota_merged <- merge(lota_clim_lo_mean, lota_topo_lo_mean, by = "Species", all = TRUE)
+lota_local_merged <- merge(lota_clim_lo_mean, lota_topo_lo_mean, by = "id", all = TRUE)
+lota_upstream_merged <- merge(lota_clim_up_mean, lota_topo_up_mean, by = "id", all = TRUE)
 
-salmo_merged <- merge(salmo_clim_lo_mean, salmo_topo_lo_mean, by = "Species", all = TRUE)
+salmo_local_merged <- merge(salmo_clim_lo_mean, salmo_topo_lo_mean, by = "id", all = TRUE)
+salmo_upstream_merged <- merge(salmo_clim_up_mean, salmo_topo_up_mean, by = "id", all = TRUE)
 
-esox_merged <- merge(esox_clim_lo_mean, esox_topo_lo_mean, by = "Species", all = TRUE)
+esox_local_merged <- merge(esox_clim_lo_mean, esox_topo_lo_mean, by = "id", all = TRUE)
+esox_upstream_merged <- merge(esox_clim_up_mean, esox_topo_up_mean, by = "id", all = TRUE)
 ```
 
+```{r}
+# create a dataframe for all local and all upstream data 
+combined_local <- bind_rows(lota_local_merged, salmo_local_merged, esox_local_merged)
+
+combined_upstream <- bind_rows(lota_upstream_merged, salmo_upstream_merged, esox_upstream_merged)
+```
+
+```{r}
+# filter "id" out
+local_data <- combined_local %>%
+  select(bio1_mean,bio12_mean,bio15_mean,elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler, Species)
+
+upstream_data <- combined_upstream %>%
+  select(bio1_mean,bio12_mean,bio15_mean,elev_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, Species)
+```
+
+```{r}
+#pca_local <- prcomp(local_data, scale. = TRUE)
+
+#autoplot(pca_local, data = local_data, colour = 'Species')
+```
 
 
 
