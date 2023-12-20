@@ -1,0 +1,75 @@
+---
+title: "PCA_fish"
+author: "Béla Kaminke"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(tibble)
+library(dplyr)
+library(ggfortify)
+library(stats)
+```
+
+```{r}
+(lota_clim_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-lota_lota-env-var-climate-local.csv"))
+```
+
+```{r}
+(lota_topo_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-lota_lota-env-var-topography-local.csv"))
+```
+
+```{r}
+(salmo_clim_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-salmo_trutta-env-var-climate-local.csv"))
+```
+
+```{r}
+(salmo_topo_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-salmo_trutta-env-var-topography-local.csv"))
+```
+
+```{r}
+(esox_clim_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-esox_lucius-env-var-climate-local.csv"))
+```
+
+```{r}
+(esox_topo_lo <- read_csv("U:/R-Studio/geofresh_plots/data/geofresh-esox_lucius-env-var-topography-local.csv"))
+```
+
+```{r}
+# filter for mean 
+lota_clim_lo_mean <- lota_clim_lo %>%
+  select(bio1_mean,bio12_mean,bio15_mean)
+
+lota_topo_lo_mean <- lota_topo_lo %>% select(elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
+
+salmo_clim_lo_mean <- lota_clim_lo %>%
+  select(bio1_mean,bio12_mean,bio15_mean)
+
+salmo_topo_lo_mean <- lota_topo_lo %>% select(elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
+
+esox_clim_lo_mean <- lota_clim_lo %>%
+  select(bio1_mean,bio12_mean,bio15_mean)
+
+esox_topo_lo_mean <- lota_topo_lo %>% select(elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
+```
+
+```{r}
+lota_clim_lo_mean <- lota_clim_lo_mean%>% mutate(Species = "Lota lota")
+lota_topo_lo_mean <- lota_topo_lo_mean%>% mutate(Species = "Lota lota")
+
+salmo_clim_lo_mean <- salmo_clim_lo_mean%>% mutate(Species = "Salmo trutta")
+salmo_topo_lo_mean <- salmo_topo_lo_mean%>% mutate(Species = "Salmo trutta")
+
+esox_clim_lo_mean <- esox_clim_lo_mean%>% mutate(Species = "Esox lucius")
+esox_topo_lo_mean <- esox_topo_lo_mean%>% mutate(Species = "Esox lucius")
+```
+
+
+
+
