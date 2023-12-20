@@ -60,6 +60,7 @@ esox_topo_lo_mean <- lota_topo_lo %>% select(elev_mean,flowpos_mean,outlet_dist_
 ```
 
 ```{r}
+# add "Species" column 
 lota_clim_lo_mean <- lota_clim_lo_mean%>% mutate(Species = "Lota lota")
 lota_topo_lo_mean <- lota_topo_lo_mean%>% mutate(Species = "Lota lota")
 
@@ -68,6 +69,15 @@ salmo_topo_lo_mean <- salmo_topo_lo_mean%>% mutate(Species = "Salmo trutta")
 
 esox_clim_lo_mean <- esox_clim_lo_mean%>% mutate(Species = "Esox lucius")
 esox_topo_lo_mean <- esox_topo_lo_mean%>% mutate(Species = "Esox lucius")
+```
+
+```{r}
+# merge climate and topography dataframes to one joint dataframe 
+lota_merged <- merge(lota_clim_lo_mean, lota_topo_lo_mean, by = "Species", all = TRUE)
+
+salmo_merged <- merge(salmo_clim_lo_mean, salmo_topo_lo_mean, by = "Species", all = TRUE)
+
+esox_merged <- merge(esox_clim_lo_mean, esox_topo_lo_mean, by = "Species", all = TRUE)
 ```
 
 
