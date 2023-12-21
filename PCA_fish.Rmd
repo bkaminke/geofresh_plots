@@ -15,6 +15,7 @@ library(tibble)
 library(dplyr)
 library(ggfortify)
 library(stats)
+library(cluster)
 ```
 
 ```{r}
@@ -33,43 +34,43 @@ library(stats)
 ```
 
 ```{r}
-# filter for mean 
+# filter for mean
 lota_clim_lo_mean <- lota_clim_lo %>%
-  select(id,bio1_mean,bio12_mean,bio15_mean)
+  select(id, bio1_mean, bio12_mean, bio15_mean)
 lota_clim_up_mean <- lota_clim_up %>%
-  select(id,bio1_mean,bio12_mean,bio15_mean)
-lota_topo_lo_mean <- lota_topo_lo %>% select(id,elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
-lota_topo_up_mean <- lota_topo_up %>% select(id,elev_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean) 
+  select(id, bio1_mean, bio12_mean, bio15_mean)
+lota_topo_lo_mean <- lota_topo_lo %>% select(id, elev_mean, flowpos_mean, outlet_dist_dw_basin_mean, outlet_dist_dw_scatch_mean, channel_dist_up_seg_mean, strahler)
+lota_topo_up_mean <- lota_topo_up %>% select(id, elev_mean, outlet_dist_dw_basin_mean, outlet_dist_dw_scatch_mean, channel_dist_up_seg_mean)
 
 salmo_clim_lo_mean <- salmo_clim_lo %>%
-  select(id,bio1_mean,bio12_mean,bio15_mean)
+  select(id, bio1_mean, bio12_mean, bio15_mean)
 salmo_clim_up_mean <- salmo_clim_up %>%
-  select(id,bio1_mean,bio12_mean,bio15_mean)
-salmo_topo_lo_mean <- salmo_topo_lo %>% select(id,elev_mean, flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
-salmo_topo_up_mean <- salmo_topo_up %>% select(id,elev_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean) 
+  select(id, bio1_mean, bio12_mean, bio15_mean)
+salmo_topo_lo_mean <- salmo_topo_lo %>% select(id, elev_mean, flowpos_mean, outlet_dist_dw_basin_mean, outlet_dist_dw_scatch_mean, channel_dist_up_seg_mean, strahler)
+salmo_topo_up_mean <- salmo_topo_up %>% select(id, elev_mean, outlet_dist_dw_basin_mean, outlet_dist_dw_scatch_mean, channel_dist_up_seg_mean)
 
 esox_clim_lo_mean <- esox_clim_lo %>%
-  select(id,bio1_mean,bio12_mean,bio15_mean)
+  select(id, bio1_mean, bio12_mean, bio15_mean)
 esox_clim_up_mean <- esox_clim_up %>%
-  select(id,bio1_mean,bio12_mean,bio15_mean)
-esox_topo_lo_mean <- esox_topo_lo %>% select(id,elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler) 
-esox_topo_up_mean <- esox_topo_lo %>% select(id,elev_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean)
+  select(id, bio1_mean, bio12_mean, bio15_mean)
+esox_topo_lo_mean <- esox_topo_lo %>% select(id, elev_mean, flowpos_mean, outlet_dist_dw_basin_mean, outlet_dist_dw_scatch_mean, channel_dist_up_seg_mean, strahler)
+esox_topo_up_mean <- esox_topo_up %>% select(id, elev_mean, outlet_dist_dw_basin_mean, outlet_dist_dw_scatch_mean, channel_dist_up_seg_mean)
 ```
 
 ```{r}
-# add "Species" column 
-lota_topo_lo_mean <- lota_topo_lo_mean%>% mutate(Species = "Lota lota")
-lota_topo_up_mean <- lota_topo_up_mean%>% mutate(Species = "Lota lota")
+# add "Species" column
+lota_topo_lo_mean <- lota_topo_lo_mean %>% mutate(Species = "Lota lota")
+lota_topo_up_mean <- lota_topo_up_mean %>% mutate(Species = "Lota lota")
 
-salmo_topo_lo_mean <- salmo_topo_lo_mean%>% mutate(Species = "Salmo trutta")
-salmo_topo_up_mean <- salmo_topo_up_mean%>% mutate(Species = "Salmo trutta")
+salmo_topo_lo_mean <- salmo_topo_lo_mean %>% mutate(Species = "Salmo trutta")
+salmo_topo_up_mean <- salmo_topo_up_mean %>% mutate(Species = "Salmo trutta")
 
-esox_topo_lo_mean <- esox_topo_lo_mean%>% mutate(Species = "Esox lucius")
-esox_topo_up_mean <- esox_topo_up_mean%>% mutate(Species = "Esox lucius")
+esox_topo_lo_mean <- esox_topo_lo_mean %>% mutate(Species = "Esox lucius")
+esox_topo_up_mean <- esox_topo_up_mean %>% mutate(Species = "Esox lucius")
 ```
 
 ```{r}
-# merge climate and topography dataframes to one joint dataframe 
+# merge climate and topography dataframes to one joint dataframe
 lota_local_merged <- merge(lota_clim_lo_mean, lota_topo_lo_mean, by = "id", all = TRUE)
 lota_upstream_merged <- merge(lota_clim_up_mean, lota_topo_up_mean, by = "id", all = TRUE)
 
@@ -81,7 +82,7 @@ esox_upstream_merged <- merge(esox_clim_up_mean, esox_topo_up_mean, by = "id", a
 ```
 
 ```{r}
-# create a dataframe for all local and all upstream data 
+# create a dataframe for all local and all upstream data
 combined_local <- bind_rows(lota_local_merged, salmo_local_merged, esox_local_merged)
 
 combined_upstream <- bind_rows(lota_upstream_merged, salmo_upstream_merged, esox_upstream_merged)
@@ -90,17 +91,51 @@ combined_upstream <- bind_rows(lota_upstream_merged, salmo_upstream_merged, esox
 ```{r}
 # filter "id" out
 local_data <- combined_local %>%
-  select(bio1_mean,bio12_mean,bio15_mean,elev_mean,flowpos_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, strahler, Species)
+  select(bio1_mean, bio12_mean, bio15_mean, elev_mean, flowpos_mean, outlet_dist_dw_basin_mean, outlet_dist_dw_scatch_mean, channel_dist_up_seg_mean, strahler, Species)
 
 upstream_data <- combined_upstream %>%
-  select(bio1_mean,bio12_mean,bio15_mean,elev_mean,outlet_dist_dw_basin_mean,outlet_dist_dw_scatch_mean,channel_dist_up_seg_mean, Species)
+  select(bio1_mean, bio12_mean, bio15_mean, elev_mean, outlet_dist_dw_basin_mean, outlet_dist_dw_scatch_mean, channel_dist_up_seg_mean, Species)
 ```
 
 ```{r}
-#pca_local <- prcomp(local_data, scale. = TRUE)
+# subset data, so that only numerical values are available
+sup_local <- local_data[1:9]
 
-#autoplot(pca_local, data = local_data, colour = 'Species')
+sup_upstream <- upstream_data[1:7]
 ```
+
+```{r}
+# create a pca for the local and the upstream data
+# local
+pca_local <- prcomp(sup_local, scale = TRUE)
+autoplot(pca_local, data = local_data, colour = "Species")
+# upstream
+pca_upstream <- prcomp(sup_upstream, scale = TRUE)
+autoplot(pca_upstream, data = upstream_data, colour = "Species")
+```
+
+```{r}
+# create a pca for the local and the upstream data with eigenvectors
+# local
+autoplot(pca_local, data = local_data, colour = "Species", loadings = TRUE)
+# upstream
+autoplot(pca_upstream, data = upstream_data, colour = "Species", loadings = TRUE)
+```
+
+```{r}
+# eigenvectors with label and colour options
+# local
+autoplot(pca_local,
+  data = local_data, colour = "Species", loadings = TRUE, loadings.colour = "blue",
+  loadings.label = TRUE, loadings.label.size = 3
+)
+# upstream
+autoplot(pca_upstream,
+  data = upstream_data, colour = "Species", loadings = TRUE, loadings.colour = "blue",
+  loadings.label = TRUE, loadings.label.size = 3
+)
+```
+
 
 
 
